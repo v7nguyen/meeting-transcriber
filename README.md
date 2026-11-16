@@ -57,6 +57,7 @@ flowchart TD
     E["Speaker Diarization<br/>FluidAudio · dual-track + recognition"]
     F["Meeting Notes Generation<br/>Claude CLI · OpenAI-compatible · none"]
     G["Markdown Meeting Notes<br/>Summary · Decisions · Tasks · Transcript"]
+    H["Notion Export (optional)<br/>Page per meeting"]
 
     A --> B
     A2 --> C
@@ -68,13 +69,14 @@ flowchart TD
     D2 --> E
     E --> F
     F --> G
+    G -.-> H
 
     classDef input fill:#5B8DEF,stroke:#3F6FD5,color:#fff
     classDef engine fill:#8B5CF6,stroke:#7C3AED,color:#fff
     classDef output fill:#22C55E,stroke:#16A34A,color:#fff
     class A,A2 input
     class D engine
-    class G output
+    class G,H output
 ```
 
 ---
@@ -96,12 +98,14 @@ flowchart TD
 - **Configurable meeting notes prompt** — Custom prompt file support (`~/Library/Application Support/MeetingTranscriber/protocol_prompt.md`) with `{LANGUAGE}`, `{MEETING_DATE}` (`YYYY-MM-DD`), and `{MEETING_TIME}` (`HH:mm`) variables; recordings include authoritative metadata, while imports and recovery jobs resolve time placeholders to `Unknown`
 - **Meeting notes from a transcript** — *Generate Meeting Notes from Transcript…* in the menu makes notes for one or more saved `.txt` transcripts, without transcribing again (not in the App Store build); transcripts that already have notes are skipped
 - **Manual recording** — Record any app via app picker, not just detected meetings
+- **Mic mute hotkey** — A global keyboard shortcut (Settings → Audio) mutes/unmutes your microphone mid-recording, from any app
 - **Multi-format input** — Supports WAV, MP3, M4A, MP4, FLAC, plus the phone and messenger voice formats AMR, 3GP/3G2 and OPUS/OGG; MKV and WebM additionally need ffmpeg
 - **Update checker** — Notifies when a new version is available
 - **Background processing** — PipelineQueue runs transcription and meeting notes generation independently from recording
 - **Record-only mode** — Skip the entire post-recording pipeline and drop dual-source recordings + a metadata sidecar into the output folder, for external/fleet processing (e.g. a separate GPU host)
 - **Local automation API** (Homebrew build): drive the pipeline headlessly over localhost HTTP. POST an audio file, get a diarized transcript back. See [`docs/automation-api.md`](docs/automation-api.md)
 - **Stream Deck and hotkey control** (Homebrew build): start/stop watching from a Stream Deck key, Shortcut, Raycast or any launcher. See [`docs/stream-deck.md`](docs/stream-deck.md)
+- **Notion export** — optionally sends each meeting's notes to a Notion database as a page, with retry on failure, an option to tag speakers, and an option to keep only the Notion page instead of a local Markdown copy
 - **Distribution** — Install via Homebrew Cask or build from source
 
 ---
@@ -251,10 +255,10 @@ Open Settings via the menu bar item or ⌘,.
 | Tab | What's in it |
 |---|---|
 | **General** | Startup (launch at login, start watching on open), record-only mode, apps to watch (Teams/Zoom/Webex/Browser/WeChat/Tencent Meeting/FaceTime/WhatsApp/Slack), detection timing |
-| **Audio** | Microphone device, voice activity detection (VAD), per-channel silence indicator, echo cancellation (off by default) |
+| **Audio** | Microphone device, voice activity detection (VAD), per-channel silence indicator, echo cancellation (off by default), mic mute hotkey |
 | **Transcription** | ASR engine (WhisperKit / Parakeet) and per-engine options (model incl. a custom WhisperKit model, language, custom vocabulary), terminology normalization rules, live caption overlay (PoC) |
 | **Speakers** | Diarization, whether the naming window opens by itself, how long unnamed meetings wait before they get the automatic names, mic speaker name, known voices, recognition stats |
-| **Output** | LLM provider (Claude CLI / OpenAI-compatible / none), saved OpenAI-compatible connections (each with its own endpoint, model and API key), transcript-retention options, notes language, a notification when meeting notes fail (on by default; the menu then offers Retry Meeting Notes), output folder, custom prompt |
+| **Output** | LLM provider (Claude CLI / OpenAI-compatible / none), saved OpenAI-compatible connections (each with its own endpoint, model and API key), transcript-retention options, notes language, a notification when meeting notes fail (on by default; the menu then offers Retry Meeting Notes), output folder, custom prompt, Notion export (off by default) |
 | **Advanced** | Permissions status, diagnostics, Local Automation API |
 | **About** | Version and build info, ffmpeg status, update checks |
 
